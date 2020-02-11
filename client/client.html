@@ -14,6 +14,8 @@
 
       if(type === 'application/json'){
         const obj = JSON.parse(xhr.response);
+
+        console.log(obj);
       
         //check the xhr status code and handle accordingly
         switch(xhr.status) {
@@ -30,24 +32,23 @@
             content.innerHTML = `<b>Forbidden</b> - Message: ${obj.message}`;
             break;
           case 500: //internal server error
-            content.innerHTML = `<b>Internal Server Error</b> - Message ${obj.message}`;
+            content.innerHTML = `<b>Internal Server Error</b> - Message: ${obj.message}`;
             break;
           case 501: //not implemented
-            content.innerHTML = `Not Implemented. - Message: ${obj.message}`;
+            content.innerHTML = `<b>Not Implemented</b> - Message: ${obj.message}`;
             break;
-          default: //default other errors we are not handling in this example
-            content.innerHTML = `Resource Not Found. - Message: ${obj.message}`;
+          default: //default other errors we are not handling
+            content.innerHTML = `<b>Resource Not Found</b> - Message: ${obj.message}`;
             break;
         }
       }
 
       else if(type === 'text/xml'){
-        
+        console.log(xhr.response);
       }
     };
     
     const sendAjax = (url, acceptedType) => {
-      console.log("beans");
       const xhr = new XMLHttpRequest();
       xhr.open('GET', url);
       xhr.setRequestHeader ("Accept", acceptedType);
@@ -61,9 +62,6 @@
       const button = document.querySelector("#send");
       let page = document.querySelector("#page");
       let type = document.querySelector("#type");
-
-      console.log(page.value);
-      console.log(type.value);
 
       const send = () => sendAjax(page.value, type.value);
 

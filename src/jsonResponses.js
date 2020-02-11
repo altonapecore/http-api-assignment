@@ -5,7 +5,6 @@ const respond = (request, response, status, object, type) => {
 };
 
 
-
 const success = (request, response, acceptedTypes) => {
   const message = {
     message: 'This is a successful response',
@@ -23,7 +22,7 @@ const success = (request, response, acceptedTypes) => {
 
   const messageString = JSON.stringify(message);
 
-  respond(request, response, 200, messageString, 'application/json');
+  return respond(request, response, 200, messageString, 'application/json');
 };
 
 const badRequest = (request, response, params, acceptedTypes) => {
@@ -37,12 +36,38 @@ const badRequest = (request, response, params, acceptedTypes) => {
     message.message = 'Missing valid query parameter set to true.';
     // give the error a consistent id
     message.id = 'badRequest';
+
+    if (acceptedTypes[0] === 'text/xml') {
+      // create a valid XML string with message tag.
+      let responseXML = '<response>';
+      responseXML = `${responseXML} <message>${message.message}</message>`;
+      responseXML = `${responseXML} <id>${message.id}</id>`;
+      responseXML = `${responseXML} </response>`;
+
+      // return response passing out string and content type
+      return respond(request, response, 400, responseXML, 'text/xml');
+    }
+
+    const messageString = JSON.stringify(message);
+
     // return our json with a 400 bad request code
-    return respond(request, response, 400, message, 'application/json');
+    return respond(request, response, 400, messageString, 'application/json');
   }
 
+  if (acceptedTypes[0] === 'text/xml') {
+    // create a valid XML string with message tag.
+    let responseXML = '<response>';
+    responseXML = `${responseXML} <message>${message.message}</message>`;
+    responseXML = `${responseXML} </response>`;
+
+    // return response passing out string and content type
+    return respond(request, response, 200, responseXML, 'text/xml');
+  }
+
+  const messageString = JSON.stringify(message);
+
   // if the parameter is here, send json with a success status code
-  return respond(request, response, 200, message, 'application/json');
+  return respond(request, response, 200, messageString, 'application/json');
 };
 
 const unauthorized = (request, response, params, acceptedTypes) => {
@@ -56,12 +81,38 @@ const unauthorized = (request, response, params, acceptedTypes) => {
     message.message = 'Missing loggedIn query parameter set to true.';
     // give the error a consistent id
     message.id = 'unauthorized';
+
+    if (acceptedTypes[0] === 'text/xml') {
+      // create a valid XML string with message tag.
+      let responseXML = '<response>';
+      responseXML = `${responseXML} <message>${message.message}</message>`;
+      responseXML = `${responseXML} <id>${message.id}</id>`;
+      responseXML = `${responseXML} </response>`;
+
+      // return response passing out string and content type
+      return respond(request, response, 401, responseXML, 'text/xml');
+    }
+
+    const messageString = JSON.stringify(message);
+
     // return our json with a 400 bad request code
-    return respond(request, response, 400, response, 'application/json');
+    return respond(request, response, 401, messageString, 'application/json');
   }
 
+  if (acceptedTypes[0] === 'text/xml') {
+    // create a valid XML string with message tag.
+    let responseXML = '<response>';
+    responseXML = `${responseXML} <message>${message.message}</message>`;
+    responseXML = `${responseXML} </response>`;
+
+    // return response passing out string and content type
+    return respond(request, response, 200, responseXML, 'text/xml');
+  }
+
+  const messageString = JSON.stringify(message);
+
   // if the parameter is here, send json with a success status code
-  return respond(request, response, 200, message, 'application/json');
+  return respond(request, response, 200, messageString, 'application/json');
 };
 
 const forbidden = (request, response, acceptedTypes) => {
@@ -70,7 +121,20 @@ const forbidden = (request, response, acceptedTypes) => {
     id: 'forbidden',
   };
 
-  respond(request, response, 403, message, 'application/json');
+  if (acceptedTypes[0] === 'text/xml') {
+    // create a valid XML string with message tag.
+    let responseXML = '<response>';
+    responseXML = `${responseXML} <message>${message.message}</message>`;
+    responseXML = `${responseXML} <id>${message.id}</id>`;
+    responseXML = `${responseXML} </response>`;
+
+    // return response passing out string and content type
+    return respond(request, response, 403, responseXML, 'text/xml');
+  }
+
+  const messageString = JSON.stringify(message);
+
+  return respond(request, response, 403, messageString, 'application/json');
 };
 
 const internal = (request, response, acceptedTypes) => {
@@ -79,7 +143,20 @@ const internal = (request, response, acceptedTypes) => {
     id: 'internalError',
   };
 
-  respond(request, response, 500, message, 'application/json');
+  if (acceptedTypes[0] === 'text/xml') {
+    // create a valid XML string with message tag.
+    let responseXML = '<response>';
+    responseXML = `${responseXML} <message>${message.message}</message>`;
+    responseXML = `${responseXML} <id>${message.id}</id>`;
+    responseXML = `${responseXML} </response>`;
+
+    // return response passing out string and content type
+    return respond(request, response, 500, responseXML, 'text/xml');
+  }
+
+  const messageString = JSON.stringify(message);
+
+  return respond(request, response, 500, messageString, 'application/json');
 };
 
 const notImplemented = (request, response, acceptedTypes) => {
@@ -88,7 +165,20 @@ const notImplemented = (request, response, acceptedTypes) => {
     id: 'notImplemented',
   };
 
-  respond(request, response, 501, message, 'application/json');
+  if (acceptedTypes[0] === 'text/xml') {
+    // create a valid XML string with message tag.
+    let responseXML = '<response>';
+    responseXML = `${responseXML} <message>${message.message}</message>`;
+    responseXML = `${responseXML} <id>${message.id}</id>`;
+    responseXML = `${responseXML} </response>`;
+
+    // return response passing out string and content type
+    return respond(request, response, 501, responseXML, 'text/xml');
+  }
+
+  const messageString = JSON.stringify(message);
+
+  return respond(request, response, 501, messageString, 'application/json');
 };
 
 const notFound = (request, response, acceptedTypes) => {
@@ -97,8 +187,21 @@ const notFound = (request, response, acceptedTypes) => {
     id: 'notFound',
   };
 
+  if (acceptedTypes[0] === 'text/xml') {
+    // create a valid XML string with message tag.
+    let responseXML = '<response>';
+    responseXML = `${responseXML} <message>${message.message}</message>`;
+    responseXML = `${responseXML} <id>${message.id}</id>`;
+    responseXML = `${responseXML} </response>`;
+
+    // return response passing out string and content type
+    return respond(request, response, 404, responseXML, 'text/xml');
+  }
+
+  const messageString = JSON.stringify(message);
+
   // return our json with a 404 not found error code
-  respond(request, response, 404, message, 'application/json');
+  return respond(request, response, 404, messageString, 'application/json');
 };
 
 module.exports = {
