@@ -9,11 +9,14 @@
     const handleResponse = (xhr) => {
 			 //grab the content section
       const content = document.querySelector("#content");
+
+      const type = xhr.getResponseHeader('content-type');
+
+      if(type === 'application/json'){
+        const obj = JSON.parse(xhr.response);
+      }
       
-      ///parse the response text into a JSON object
-      const obj = JSON.parse(xhr.response);
-      console.log(`status code: ${xhr.status}`);
-      console.log(`xhr.response: ${xhr.response}`);
+      
       
       //check the xhr status code and handle accordingly
       switch(xhr.status) {
@@ -41,10 +44,10 @@
       }
     };
     
-    const sendAjax = (url) => {
+    const sendAjax = (url, acceptedType) => {
       const xhr = new XMLHttpRequest();
       xhr.open('GET', url);
-      xhr.setRequestHeader ("Accept", 'application/json');
+      xhr.setRequestHeader ("Accept", acceptedType);
 
       xhr.onload = () => handleResponse(xhr);
       
@@ -53,6 +56,9 @@
 
     const init = () => {
       const button = document.querySelector("#send");
+      let page = document.querySelector("#page");
+      let type = document.querySelector("#type");
+      button.onClick = () => sendAjax(page.value, type.value)
     };
 
     window.onload = init;
@@ -74,7 +80,7 @@
       <option value="application/json">JSON</option>
       <option value="text/xml">XML</option>
     </select>
-    <button onclick="sendAjax()" id="send">Send</button>
+    <button id="send">Send</button>
   </section>
   <section id="content">
   </section>
