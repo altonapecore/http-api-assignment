@@ -1,90 +1,104 @@
-const respondJSON = (request, response, status, object) => {
-  response.writeHead(status, { 'Content-Type': 'application/json', dorkus: 'true' });
-  response.write(JSON.stringify(object));
+const respond = (request, response, status, object, type) => {
+  response.writeHead(status, { 'Content-Type': type });
+  response.write(object);
   response.end();
 };
 
-const success = (request, response) => {
-  const responseJSON = {
+
+
+const success = (request, response, acceptedTypes) => {
+  const message = {
     message: 'This is a successful response',
   };
 
-  respondJSON(request, response, 200, responseJSON);
+  if (acceptedTypes[0] === 'text/xml') {
+    // create a valid XML string with message tag.
+    let responseXML = '<response>';
+    responseXML = `${responseXML} <message>${message.message}</message>`;
+    responseXML = `${responseXML} </response>`;
+
+    // return response passing out string and content type
+    return respond(request, response, responseXML, 'text/xml');
+  }
+
+  const messageString = JSON.stringify(message);
+
+  respond(request, response, 200, messageString, 'application/json');
 };
 
-const badRequest = (request, response, params) => {
-  const responseJSON = {
+const badRequest = (request, response, params, acceptedTypes) => {
+  const message = {
     message: 'This request has the required parameters.',
   };
 
   // if the request does not contain a valid=true query parameter
   if (!params.valid || params.valid !== 'true') {
     // set our error message
-    responseJSON.message = 'Missing valid query parameter set to true.';
+    message.message = 'Missing valid query parameter set to true.';
     // give the error a consistent id
-    responseJSON.id = 'badRequest';
+    message.id = 'badRequest';
     // return our json with a 400 bad request code
-    return respondJSON(request, response, 400, responseJSON);
+    return respond(request, response, 400, message, 'application/json');
   }
 
   // if the parameter is here, send json with a success status code
-  return respondJSON(request, response, 200, responseJSON);
+  return respond(request, response, 200, message, 'application/json');
 };
 
-const unauthorized = (request, response, params) => {
-  const responseJSON = {
+const unauthorized = (request, response, params, acceptedTypes) => {
+  const message = {
     message: 'This request has the required parameters.',
   };
 
   // if the request does not contain a valid=true query parameter
   if (!params.loggedIn || params.loggedIn !== 'true') {
     // set our error message
-    responseJSON.message = 'Missing loggedIn query parameter set to true.';
+    message.message = 'Missing loggedIn query parameter set to true.';
     // give the error a consistent id
-    responseJSON.id = 'unauthorized';
+    message.id = 'unauthorized';
     // return our json with a 400 bad request code
-    return respondJSON(request, response, 400, responseJSON);
+    return respond(request, response, 400, response, 'application/json');
   }
 
   // if the parameter is here, send json with a success status code
-  return respondJSON(request, response, 200, responseJSON);
+  return respond(request, response, 200, message, 'application/json');
 };
 
-const forbidden = (request, response) => {
-  const responseJSON = {
+const forbidden = (request, response, acceptedTypes) => {
+  const message = {
     message: 'You do not have access to this content.',
-    id: 'forbidden'
+    id: 'forbidden',
   };
 
-  respondJSON(request, response, 403, responseJSON);
+  respond(request, response, 403, message, 'application/json');
 };
 
-const internal = (request, response) => {
-  const responseJSON = {
+const internal = (request, response, acceptedTypes) => {
+  const message = {
     message: 'Internal Server Error. Something went wrong.',
-    id: 'internalError'
+    id: 'internalError',
   };
 
-  respondJSON(request, response, 500, responseJSON);
+  respond(request, response, 500, message, 'application/json');
 };
 
-const notImplemented = (request, response) => {
-  const responseJSON = {
+const notImplemented = (request, response, acceptedTypes) => {
+  const message = {
     message: 'A get request for this page has not been implemented yet. Check again later for updated content.',
-    id: 'notImplemented'
+    id: 'notImplemented',
   };
 
-  respondJSON(request, response, 501, responseJSON);
+  respond(request, response, 501, message, 'application/json');
 };
 
-const notFound = (request, response) => {
-  const responseJSON = {
+const notFound = (request, response, acceptedTypes) => {
+  const message = {
     message: 'The page you are looking for was not found.',
     id: 'notFound',
   };
 
   // return our json with a 404 not found error code
-  respondJSON(request, response, 404, responseJSON);
+  respond(request, response, 404, message, 'application/json');
 };
 
 module.exports = {
